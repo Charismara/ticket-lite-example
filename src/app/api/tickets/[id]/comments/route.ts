@@ -4,6 +4,7 @@ import {
 	createComment,
 	getCommentsByTicketId,
 } from "~/server/actions/comment";
+import { commentEvents } from "~/server/events/commentEvents";
 
 export async function GET(
 	_request: NextRequest,
@@ -27,6 +28,13 @@ export async function POST(
 		...body,
 		ticketId: Number(id),
 	});
+
+	if (newComment) {
+		commentEvents.emitNewComment({
+			ticketId: Number(id),
+			commentId: newComment.id,
+		});
+	}
 
 	return NextResponse.json(newComment, { status: 201 });
 }

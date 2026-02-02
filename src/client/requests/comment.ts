@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ms from "ms";
+import { useEffect } from "react";
 import {
 	type CreateCommentInput,
 	getCommentsByTicketId,
@@ -15,6 +16,33 @@ export const useCommentsQuery = (ticketId: number) =>
 		staleTime: ms("10s"),
 		enabled: ticketId > 0,
 	});
+
+export const useCommentsSSE = (ticketId: number) => {
+	const queryClient = useQueryClient();
+
+	useEffect(() => {
+		if (ticketId <= 0) return;
+
+		const eventSource = new EventSource(
+			`/api/tickets/${ticketId}/comments/stream`,
+		);
+
+		eventSource.onmessage = () => {
+			queryClient.invalidateQueries({
+				queryKey: ["tickets", ticketId, "comments"],
+			});
+		};
+
+		eventSource.onerror = () => {
+			// Bei Fehler schließen - Fallback auf Polling bleibt aktiv
+			eventSource.close();
+		};
+
+		return () => {
+			eventSource.close();
+		};
+	}, [ticketId, queryClient]);
+};
 
 export const useCreateCommentMutation = () => {
 	const queryClient = useQueryClient();

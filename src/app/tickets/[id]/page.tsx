@@ -23,6 +23,7 @@ import {
 import { useSelectedUser } from "~/client/context/UserContext";
 import {
 	useCommentsQuery,
+	useCommentsSSE,
 	useCreateCommentMutation,
 } from "~/client/requests/comment";
 import { useTeamsQuery } from "~/client/requests/team";
@@ -42,6 +43,7 @@ export default function TicketDetailPage() {
 
 	const ticketQuery = useTicketQuery(ticketId);
 	const commentsQuery = useCommentsQuery(ticketId);
+	useCommentsSSE(ticketId);
 	const usersQuery = useUsersQuery();
 	const teamsQuery = useTeamsQuery();
 	const { selectedUser, selectedUserId } = useSelectedUser();
