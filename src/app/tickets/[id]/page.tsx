@@ -51,7 +51,6 @@ export default function TicketDetailPage() {
 
 	const userTeams = userWithTeamsQuery.data?.teams ?? [];
 
-	const [commentUserId, setCommentUserId] = useState<number | null>(null);
 	const [commentText, setCommentText] = useState("");
 	const [commentInternalOnly, setCommentInternalOnly] = useState(false);
 
@@ -78,13 +77,13 @@ export default function TicketDetailPage() {
 
 	const handleCommentSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		if (!commentUserId || !commentText.trim()) return;
+		if (!selectedUserId || !commentText.trim()) return;
 
 		createCommentMutation
 			.mutateAsync({
 				ticketId,
 				input: {
-					userId: commentUserId,
+					userId: selectedUserId,
 					comment: commentText,
 					internalOnly: commentInternalOnly,
 				},
@@ -128,7 +127,7 @@ export default function TicketDetailPage() {
 		return (
 			<Container className="py-4">
 				<Alert variant="danger">Ticket nicht gefunden.</Alert>
-				<Link href="/tickets">
+				<Link href={`/tickets${selectedUserId ? `?userId=${selectedUserId}` : ""}` as "/tickets"}>
 					<Button variant="secondary">Zurück zur Übersicht</Button>
 				</Link>
 			</Container>
@@ -141,7 +140,7 @@ export default function TicketDetailPage() {
 		<Container className="py-4">
 			<div className="d-flex justify-content-between mb-4 align-items-center">
 				<h1 className="mb-0">Ticket #{ticket.id}</h1>
-				<Link href="/tickets">
+				<Link href={`/tickets${selectedUserId ? `?userId=${selectedUserId}` : ""}` as "/tickets"}>
 					<Button variant="outline-secondary">Zurück zur Übersicht</Button>
 				</Link>
 			</div>
@@ -220,55 +219,51 @@ export default function TicketDetailPage() {
 
 							{/* Neuer Kommentar */}
 							<h6>Neuer Kommentar</h6>
-							<Form onSubmit={handleCommentSubmit}>
-								<FormGroup className="mb-3">
-									<FormLabel>Benutzer</FormLabel>
-									<FormSelect
-										onChange={(e) =>
-											setCommentUserId(
-												e.target.value ? Number(e.target.value) : null,
-											)
-										}
-										required
-										value={commentUserId ?? ""}
+							{!selectedUserId ? (
+								<Alert variant="info">
+									Bitte wählen Sie einen Benutzer in der Navigationsleiste aus,
+									um einen Kommentar zu schreiben.
+								</Alert>
+							) : (
+								<Form onSubmit={handleCommentSubmit}>
+									<FormGroup className="mb-3">
+										<FormLabel>Benutzer</FormLabel>
+										<FormControl
+											disabled
+											type="text"
+											value={selectedUser?.name ?? ""}
+										/>
+									</FormGroup>
+									<FormGroup className="mb-3">
+										<FormLabel>Kommentar</FormLabel>
+										<FormControl
+											as="textarea"
+											onChange={(e) => setCommentText(e.target.value)}
+											placeholder="Kommentar eingeben..."
+											required
+											rows={3}
+											value={commentText}
+										/>
+									</FormGroup>
+									<FormGroup className="mb-3">
+										<FormCheck
+											checked={commentInternalOnly}
+											label="Nur intern sichtbar"
+											onChange={(e) => setCommentInternalOnly(e.target.checked)}
+											type="checkbox"
+										/>
+									</FormGroup>
+									<Button
+										disabled={createCommentMutation.isPending}
+										type="submit"
+										variant="primary"
 									>
-										<option value="">Benutzer auswählen...</option>
-										{usersQuery.data?.map((user) => (
-											<option key={user.id} value={user.id}>
-												{user.name}
-											</option>
-										))}
-									</FormSelect>
-								</FormGroup>
-								<FormGroup className="mb-3">
-									<FormLabel>Kommentar</FormLabel>
-									<FormControl
-										as="textarea"
-										onChange={(e) => setCommentText(e.target.value)}
-										placeholder="Kommentar eingeben..."
-										required
-										rows={3}
-										value={commentText}
-									/>
-								</FormGroup>
-								<FormGroup className="mb-3">
-									<FormCheck
-										checked={commentInternalOnly}
-										label="Nur intern sichtbar"
-										onChange={(e) => setCommentInternalOnly(e.target.checked)}
-										type="checkbox"
-									/>
-								</FormGroup>
-								<Button
-									disabled={createCommentMutation.isPending}
-									type="submit"
-									variant="primary"
-								>
-									{createCommentMutation.isPending
-										? "Speichern..."
-										: "Kommentar hinzufügen"}
-								</Button>
-							</Form>
+										{createCommentMutation.isPending
+											? "Speichern..."
+											: "Kommentar hinzufügen"}
+									</Button>
+								</Form>
+							)}
 						</CardBody>
 					</Card>
 				</Col>

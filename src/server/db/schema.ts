@@ -57,7 +57,7 @@ export const comment = createTable("comment", (d) => ({
 	ticketId: d
 		.integer("task_id")
 		.notNull()
-		.references(() => ticket.id),
+		.references(() => ticket.id, { onDelete: "cascade" }),
 	userId: d
 		.integer("user_id")
 		.notNull()

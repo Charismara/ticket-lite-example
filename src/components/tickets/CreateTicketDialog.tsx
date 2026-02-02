@@ -26,9 +26,6 @@ type CreateTicketDialogProps = {
 export function CreateTicketDialog({ show, onHide }: CreateTicketDialogProps) {
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
-	const [status, setStatus] = useState<
-		"offen" | "in bearbeitung" | "abgeschlossen"
-	>("offen");
 	const [assignedUserId, setAssignedUserId] = useState<number | null>(null);
 	const [responsibleTeamId, setResponsibleTeamId] = useState<number | null>(
 		null,
@@ -44,7 +41,6 @@ export function CreateTicketDialog({ show, onHide }: CreateTicketDialogProps) {
 	const handleClose = () => {
 		setTitle("");
 		setDescription("");
-		setStatus("offen");
 		setAssignedUserId(null);
 		setResponsibleTeamId(null);
 		onHide();
@@ -57,7 +53,7 @@ export function CreateTicketDialog({ show, onHide }: CreateTicketDialogProps) {
 			.mutateAsync({
 				title,
 				description,
-				status,
+				status: "offen",
 				assignedUserId,
 				responsibleTeamId,
 			})
@@ -109,24 +105,6 @@ export function CreateTicketDialog({ show, onHide }: CreateTicketDialogProps) {
 									{team.name}
 								</option>
 							))}
-						</FormSelect>
-					</FormGroup>
-					<FormGroup className="mb-3">
-						<FormLabel>Status</FormLabel>
-						<FormSelect
-							onChange={(e) =>
-								setStatus(
-									e.target.value as
-										| "offen"
-										| "in bearbeitung"
-										| "abgeschlossen",
-								)
-							}
-							value={status}
-						>
-							<option value="offen">Offen</option>
-							<option value="in bearbeitung">In Bearbeitung</option>
-							<option value="abgeschlossen">Abgeschlossen</option>
 						</FormSelect>
 					</FormGroup>
 					<FormGroup className="mb-3">

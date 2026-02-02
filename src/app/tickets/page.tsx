@@ -365,7 +365,7 @@ export default function TicketsPage() {
 										: "-"}
 								</td>
 								<td>
-									<Link href={`/tickets/${ticket.id}`}>
+									<Link href={`/tickets/${ticket.id}${selectedUserId ? `?userId=${selectedUserId}` : ""}`}>
 										<Button className="me-2" size="sm" variant="info">
 											Ansehen
 										</Button>

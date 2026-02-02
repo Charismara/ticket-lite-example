@@ -42,7 +42,7 @@ export const createTicket = async (input: CreateTicketInput) => {
 		.values({
 			title: input.title,
 			description: input.description,
-			status: input.status,
+			status: "offen", // Status ist bei neuen Tickets immer "offen"
 			assignedUserId: input.assignedUserId,
 			responsibleTeamId: input.responsibleTeamId,
 		})
